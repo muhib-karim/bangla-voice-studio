@@ -2,6 +2,7 @@
 import importlib.abc
 import os
 import socket
+import selectors
 import sys
 
 import pytest
@@ -18,6 +19,19 @@ class NoModelImports(importlib.abc.MetaPathFinder):
 def isolate(monkeypatch, tmp_path, request):
     if request.node.get_closest_marker('models'):
         return
+    # Some managed sandboxes deny AF_UNIX send(), including asyncio's wakeup
+    # socket. Poll only in that environment; do not change application I/O.
+    reader, writer = socket.socketpair()
+    try:
+        writer.send(b'x')
+    except PermissionError:
+        original_select = selectors.DefaultSelector.select
+        def bounded_select(selector, timeout=None):
+            return original_select(selector, .01 if timeout is None else min(timeout, .01))
+        monkeypatch.setattr(selectors.DefaultSelector, 'select', bounded_select)
+    finally:
+        reader.close()
+        writer.close()
     monkeypatch.setenv('BVS_TEST_MODE', '1')
     monkeypatch.setenv('BVS_OFFLINE', '1')
     monkeypatch.setenv('HF_HUB_OFFLINE', '1')

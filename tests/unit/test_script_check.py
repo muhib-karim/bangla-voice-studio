@@ -1,4 +1,4 @@
-from bvs.asr.script import DEVANAGARI_WARNING, bangla_script_warnings, script_counts
+from bvs.script_check import DEVANAGARI_WARNING, bangla_script_warnings, script_counts
 
 
 def test_counts_each_script() -> None:

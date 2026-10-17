@@ -230,7 +230,7 @@ class _Adapter:
             words = tuple(Word(w.word, w.start, w.end, w.probability) for w in (raw.words or ()))
             segments_list.append(Segment(raw.text, raw.start, raw.end, words))
         segments = tuple(segments_list)
-        from bvs.asr.script import bangla_script_warnings
+        from bvs.script_check import bangla_script_warnings
 
         text = "".join(s.text for s in segments).strip()
         return ASRResult(

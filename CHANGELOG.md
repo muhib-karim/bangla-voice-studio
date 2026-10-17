@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1 — 2026-10-18
+
+- Pin PyAV below 19 in the `asr` extra: PyAV 19 removed the `metadata_errors` argument that faster-whisper 1.2 passes, which broke transcription on fresh installs (seen on Python 3.12 in the model smoke test).
+
 ## 0.1.0 — 2026-10-18
 
 - Bangla normalization with the PLAN examples and local upstream regression fixtures.

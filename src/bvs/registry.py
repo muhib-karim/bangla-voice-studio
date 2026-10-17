@@ -230,14 +230,18 @@ class _Adapter:
             words = tuple(Word(w.word, w.start, w.end, w.probability) for w in (raw.words or ()))
             segments_list.append(Segment(raw.text, raw.start, raw.end, words))
         segments = tuple(segments_list)
+        from bvs.script_check import bangla_script_warnings
+
+        text = "".join(s.text for s in segments).strip()
         return ASRResult(
-            "".join(s.text for s in segments).strip(),
+            text,
             info.language,
             duration,
             segments,
             request.word_timestamps,
             self.spec.id,
             self.spec.model_revision,
+            bangla_script_warnings(text, request.language),
         )
 
     def _ready(self, context: RunContext) -> None:

@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Warn when Bangla transcription comes back in Devanagari script. The v0.1.1 model smoke test showed Whisper small does this for MMS-TTS Bangla audio even with `language="bn"`; the transcript now carries a warning instead of passing silently.
+- README: results from the v0.1.1 model smoke test.
+
 ## 0.1.1 — 2026-10-18
 
 - Pin PyAV below 19 in the `asr` extra: PyAV 19 removed the `metadata_errors` argument that faster-whisper 1.2 passes, which broke transcription on fresh installs (seen on Python 3.12 in the model smoke test).

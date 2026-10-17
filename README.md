@@ -6,7 +6,7 @@
 
 Prepare Bangla text, run local speech and transcription jobs, and export WAV audio with SRT/VTT captions. Use the `bvs` CLI or the bundled Bangla/English browser workspace. No hosted inference, CDN assets, frontend build, or automatic model downloads.
 
-**0.1.0 development draft.** The dummy tone and fake transcript workflows are the model-free reference path. MMS and faster-whisper have lazy adapters awaiting remote smoke evidence. Indic-Parler, IndicF5 and OmniVoice are registered but their inference integrations are unavailable. See [REVIEW.md](REVIEW.md) for limits and M3 work. This is not a v1 release claim.
+**0.1.x pre-release.** The dummy tone and fake transcript workflows are the model-free reference path. MMS-TTS and faster-whisper run for real in the `models-smoke` workflow on GitHub Actions (Python 3.11 and 3.12); measured numbers are in the results section below. Indic-Parler, IndicF5 and OmniVoice are registered but their inference integrations are unavailable. See [REVIEW.md](REVIEW.md) for limits and M3 work. This is not a v1 release claim.
 
 ## Demo
 

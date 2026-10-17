@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Tests: integration test that parses exported SRT and VTT independently and checks the cue times are monotonic, identical across formats, and end within the audio (PLAN M3.1).
 - Model smoke test: print transcript warnings (such as the Devanagari-script warning) in the job log and list them under the CER table, so they show without opening the JSON report.
 
 ## 0.1.2 — 2026-10-18

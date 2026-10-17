@@ -1,0 +1,102 @@
+name: Models smoke
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 3 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: models-smoke-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  BVS_MODELS_SMOKE: '1'
+  OMP_NUM_THREADS: '2'
+  OPENBLAS_NUM_THREADS: '1'
+  TOKENIZERS_PARALLELISM: 'false'
+  HF_HUB_DISABLE_TELEMETRY: '1'
+
+jobs:
+  mms:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      max-parallel: 1
+      matrix:
+        python: ['3.11', '3.12']
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Check starting disk and install CPU MMS only
+        run: |
+          python -c "import shutil; assert shutil.disk_usage('.').free >= 10 * 1024**3"
+          python -m venv .venv
+          .venv/bin/python -m pip install --no-cache-dir 'torch>=2.4,<3' --index-url https://download.pytorch.org/whl/cpu
+          .venv/bin/python -m pip install --no-cache-dir '.[mms]'
+          mkdir -p smoke
+          .venv/bin/python -m pip freeze > smoke/mms-packages.txt
+      - name: Provision explicitly
+        run: .venv/bin/python scripts/model_smoke.py provision mms --cache models --output smoke
+      - name: Synthesize five sentences with denied egress and a hard memory limit
+        run: |
+          sudo mkdir /sys/fs/cgroup/bvs-smoke
+          echo 6442450944 | sudo tee /sys/fs/cgroup/bvs-smoke/memory.max
+          echo 0 | sudo tee /sys/fs/cgroup/bvs-smoke/memory.swap.max
+          echo $$ | sudo tee /sys/fs/cgroup/bvs-smoke/cgroup.procs
+          sudo unshare --net -- setpriv --reuid="$(id -u)" --regid="$(id -g)" --init-groups env GITHUB_ACTIONS=true BVS_MODELS_SMOKE=1 GITHUB_SHA="$GITHUB_SHA" HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 BVS_OFFLINE=1 OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=1 /usr/bin/time -v -o smoke/mms-time.txt .venv/bin/python scripts/model_smoke.py synthesize mms --cache models --output smoke
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: mms-${{ matrix.python }}
+          path: smoke/
+          retention-days: 30
+          if-no-files-found: error
+  whisper:
+    needs: mms
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      max-parallel: 1
+      matrix:
+        python: ['3.11', '3.12']
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: mms-${{ matrix.python }}
+          path: smoke
+      - name: Check disk and install Whisper only
+        run: |
+          python -c "import shutil; assert shutil.disk_usage('.').free >= 10 * 1024**3"
+          python -m venv .venv
+          .venv/bin/python -m pip install --no-cache-dir '.[whisper]'
+          .venv/bin/python -m pip freeze > smoke/whisper-packages.txt
+      - name: Provision explicitly
+        run: .venv/bin/python scripts/model_smoke.py provision faster-whisper --cache models --output smoke
+      - name: Transcribe all samples offline and write CER table
+        run: |
+          sudo mkdir /sys/fs/cgroup/bvs-smoke
+          echo 6442450944 | sudo tee /sys/fs/cgroup/bvs-smoke/memory.max
+          echo 0 | sudo tee /sys/fs/cgroup/bvs-smoke/memory.swap.max
+          echo $$ | sudo tee /sys/fs/cgroup/bvs-smoke/cgroup.procs
+          sudo unshare --net -- setpriv --reuid="$(id -u)" --regid="$(id -g)" --init-groups env GITHUB_ACTIONS=true BVS_MODELS_SMOKE=1 GITHUB_SHA="$GITHUB_SHA" HF_HUB_OFFLINE=1 BVS_OFFLINE=1 OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=1 /usr/bin/time -v -o smoke/whisper-time.txt .venv/bin/python scripts/model_smoke.py transcribe faster-whisper --cache models --output smoke
+          cat smoke/CER.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: roundtrip-${{ matrix.python }}
+          path: smoke/
+          retention-days: 30
+          if-no-files-found: error

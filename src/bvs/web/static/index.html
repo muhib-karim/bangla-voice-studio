@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>বাংলা ভয়েস স্টুডিও · Bangla Voice Studio</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/styles.css">
+  <script type="module" src="/static/app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main" data-i18n="skip">মূল অংশে যান</a>
+  <div class="app-shell">
+    <header class="rail">
+      <a class="brand" href="/speak">বাংলা ভয়েস স্টুডিও<span lang="en">Bangla Voice Studio</span></a>
+      <button id="nav-toggle" type="button" aria-expanded="true" aria-controls="navigation" data-i18n="navigation">পাতার তালিকা</button>
+      <nav id="navigation" aria-label="Studio">
+        <a href="/speak" data-i18n="speak">বলুন</a>
+        <a href="/clone" data-i18n="clone">কণ্ঠ অনুকরণ</a>
+        <a href="/transcribe" data-i18n="transcribe">প্রতিলিপি</a>
+        <a href="/audiobook" data-i18n="audiobook">অডিওবই</a>
+        <a href="/engines" data-i18n="engines">ইঞ্জিন</a>
+      </nav>
+      <div class="preferences">
+        <button type="button" id="language">English</button>
+        <button type="button" id="theme" data-i18n="dark">গাঢ় রং</button>
+      </div>
+      <p class="muted" data-i18n="local">লেখা ও অডিও এই কম্পিউটারেই থাকে।</p>
+    </header>
+    <main id="main" tabindex="-1">
+      <p id="status-strip" class="muted"></p>
+      <p id="demo-banner" class="notice" data-testid="demo-banner" data-i18n="demo" hidden></p>
+      <div id="page"></div>
+      <noscript>এই পাতার কাজ চালাতে JavaScript চালু করুন। <span lang="en">Enable JavaScript, or use the bvs CLI.</span></noscript>
+    </main>
+  </div>
+</body>
+</html>

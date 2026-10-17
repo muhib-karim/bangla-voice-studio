@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="বাংলা লেখা প্রস্তুত করুন, স্থানীয় মডেলে অডিও তৈরি করুন এবং প্রতিলিপি রপ্তানি করুন।">
+  <title>বাংলা ভয়েস স্টুডিও · Bangla Voice Studio</title>
+  <link rel="stylesheet" href="assets/styles.css">
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+  <a class="skip" href="#main">মূল অংশে যান <span lang="en">Skip to content</span></a>
+  <header class="site-header">
+    <a class="brand" href="./">বাংলা ভয়েস স্টুডিও</a>
+    <nav aria-label="প্রকল্পের তথ্য">
+      <a href="#start">শুরু করুন <span lang="en">Quick start</span></a>
+      <a href="https://github.com/muhib-karim/bangla-voice-studio">GitHub</a>
+    </nav>
+  </header>
+  <main id="main" class="landing">
+    <section class="intro">
+      <h1>বাংলা লেখা থেকে<br>শোনার উপযোগী অডিও।</h1>
+      <p>সংখ্যা, তারিখ ও টাকার পড়ার রূপ দেখুন। নিজের কম্পিউটারে অডিও তৈরির কাজ চালান। WAV, SRT ও VTT ফাইল সংরক্ষণ করুন।</p>
+      <p lang="en">Bangla Voice Studio prepares Bangla text, runs local narration jobs, and exports audio and captions. Python CLI and a browser workspace, with no hosted inference.</p>
+      <a class="button primary" href="#start">ডেমো চালান <span lang="en">Run the demo</span></a>
+      <p class="muted" lang="en">Version 0.1.0 draft. The demo produces test tones. Real model validation is pending.</p>
+    </section>
+    <section id="start">
+      <h2>নিজের কম্পিউটারে শুরু করুন <span lang="en">Quick start</span></h2>
+      <p lang="en">Python 3.11 or 3.12 and ffmpeg. Install from a checkout; installation does not download models.</p>
+      <pre><code>git clone https://github.com/muhib-karim/bangla-voice-studio.git
+cd bangla-voice-studio
+python -m venv .venv
+.venv/bin/python -m pip install .
+.venv/bin/bvs normalize '৳৫০'
+.venv/bin/bvs say 'আমি বাংলায় বলি।' --engine dummy --output demo.wav
+.venv/bin/bvs serve --demo</code></pre>
+      <p lang="en">Open <code>http://127.0.0.1:8000</code>. Speak, Clone, Transcribe, Audiobook, and Engines share a local job queue. Clone and Transcribe use simulated results in demo mode.</p>
+      <p><a href="https://github.com/muhib-karim/bangla-voice-studio#installation" lang="en">Model installation and offline provisioning</a></p>
+    </section>
+    <section aria-labelledby="screenshots">
+      <h2 id="screenshots">কাজের দৃশ্য <span lang="en">Screenshots</span></h2>
+      <figure class="placeholder">
+        <p>স্ক্রিনশট এখানে যুক্ত হবে।</p>
+        <figcaption lang="en">Screenshot placeholder. The E2E workflow captures the real UI and a GIF using a test tone; artifacts will be linked after CI runs.</figcaption>
+      </figure>
+    </section>
+    <section>
+      <h2>ইঞ্জিন ও লাইসেন্স <span lang="en">Engines and licenses</span></h2>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="ইঞ্জিনের তালিকা">
+        <table>
+          <caption lang="en">Adapter status for this development milestone. No quality measurements yet.</caption>
+          <thead><tr><th scope="col">ইঞ্জিন / Engine</th><th scope="col">অবস্থা / Status</th><th scope="col">লাইসেন্স / License</th></tr></thead>
+          <tbody lang="en">
+            <tr><th scope="row">MMS-TTS-ben</th><td>CPU adapter; remote test pending</td><td><a href="https://github.com/muhib-karim/bangla-voice-studio/blob/main/docs/MODEL_LICENSES.md#mms">CC-BY-NC-4.0 · non-commercial</a></td></tr>
+            <tr><th scope="row">Indic-Parler-TTS</th><td>Registered; integration unavailable</td><td><a href="https://github.com/muhib-karim/bangla-voice-studio/blob/main/docs/MODEL_LICENSES.md">Unknown · verify on the model card</a></td></tr>
+            <tr><th scope="row">IndicF5</th><td>Registered; integration unavailable</td><td><a href="https://github.com/muhib-karim/bangla-voice-studio/blob/main/docs/MODEL_LICENSES.md">Unknown · verify on the model card</a></td></tr>
+            <tr><th scope="row">OmniVoice</th><td>Registered; integration unavailable</td><td><a href="https://github.com/muhib-karim/bangla-voice-studio/blob/main/docs/MODEL_LICENSES.md">Unknown · verify on the model card</a></td></tr>
+            <tr><th scope="row">VoxCPM2-Bangla</th><td>Not published yet</td><td><a href="https://github.com/muhib-karim/bangla-voice-studio/blob/main/docs/MODEL_LICENSES.md">Unknown base and adapter terms</a></td></tr>
+            <tr><th scope="row">faster-whisper small</th><td>CPU adapter; remote test pending</td><td><a href="https://github.com/muhib-karim/bangla-voice-studio/blob/main/docs/MODEL_LICENSES.md">Checkpoint and runtime: verify on the model card</a></td></tr>
+            <tr><th scope="row">Dummy / fake ASR</th><td>Test tones / sample transcripts</td><td><a href="https://github.com/muhib-karim/bangla-voice-studio/blob/main/LICENSE">MIT</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer"><p lang="en">© 2026 Muhib Karim · Code: MIT · Font: SIL OFL 1.1</p><a href="https://github.com/muhib-karim/bangla-voice-studio">সোর্স কোড <span lang="en">Source code</span></a></footer>
+</body>
+</html>

@@ -15,3 +15,7 @@ outputs/
 test-results/
 playwright-report/
 docs/demo.gif
+screenshots/
+_site/
+smoke/
+vq

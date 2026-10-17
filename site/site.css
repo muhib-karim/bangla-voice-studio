@@ -1,0 +1,15 @@
+.site-header, .site-footer { max-width: 1160px; margin-inline: auto; padding: 24px; display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+.site-header nav { display: flex; flex-wrap: wrap; gap: 24px; }
+.landing { max-width: 1160px; margin: auto; padding: 0 24px 48px; }
+.landing section { padding-block: 32px; border-bottom: 1px solid var(--border); }
+.landing .intro { padding-block: 64px 48px; }
+.intro h1 { font-size: clamp(32px, 5vw, 56px); line-height: 1.45; }
+.landing p { max-width: 72ch; }
+.landing h2 span, .site-header a span { display: block; font-size: 16px; color: var(--muted); font-weight: 400; }
+.placeholder { margin: 24px 0; padding: 32px; border: 1px dashed var(--border); background: var(--surface); }
+.table-scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; text-align: left; font-size: 16px; }
+th, td { padding: 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+caption { text-align: left; margin-block: 16px; color: var(--muted); }
+pre { background: var(--surface); border: 1px solid var(--border); padding: 24px; border-radius: 8px; overflow-x: auto; font-size: 16px; }
+@media (max-width: 600px) { .landing, .site-header, .site-footer { padding-inline: 16px; } .landing .intro { padding-block: 32px; } th, td { padding: 8px; } }

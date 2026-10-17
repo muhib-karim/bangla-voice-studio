@@ -1,0 +1,30 @@
+cff-version: 1.2.0
+message: "If you use Bangla Voice Studio, please cite this software."
+type: software
+title: Bangla Voice Studio
+version: 0.1.0
+date-released: '2026-10-17'
+authors:
+  - given-names: Muhib
+    family-names: Karim
+repository-code: https://github.com/muhib-karim/bangla-voice-studio
+url: https://muhib-karim.github.io/bangla-voice-studio/
+license: MIT
+abstract: "Local Bangla text normalization, narration jobs, transcription, and captions."
+keywords:
+  - Bangla
+  - text-to-speech
+  - speech-recognition
+references:
+  - type: software
+    title: bangla-tts-bench
+    authors:
+      - given-names: Muhib
+        family-names: Karim
+    repository-code: https://github.com/muhib-karim/bangla-tts-bench
+  - type: generic
+    title: MMS Bangla model card
+    url: https://huggingface.co/facebook/mms-tts-ben
+  - type: generic
+    title: faster-whisper small model card
+    url: https://huggingface.co/Systran/faster-whisper-small

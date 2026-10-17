@@ -1,0 +1,85 @@
+id	category	text	spoken
+1	cardinal	০	শূন্য
+2	cardinal	0	শূন্য
+3	cardinal	৯	নয়
+4	cardinal	16	ষোলো
+5	cardinal	২১	একুশ
+6	cardinal	২৮	আটাশ
+7	cardinal	99	নিরানব্বই
+8	cardinal	১০০	একশো
+9	cardinal	১০১	একশো এক
+10	cardinal	১২৫০	এক হাজার দুইশো পঞ্চাশ
+11	grouping	25,000	পঁচিশ হাজার
+12	grouping	১,৫০,০০০	এক লাখ পঞ্চাশ হাজার
+13	grouping	2,00,00,000	দুই কোটি
+14	decimal	3.14	তিন দশমিক এক চার
+15	decimal	০.০৫	শূন্য দশমিক শূন্য পাঁচ
+16	decimal	১.২০	এক দশমিক দুই শূন্য
+17	sign	-১২	মাইনাস বারো
+18	sign	+5	প্লাস পাঁচ
+19	sign	-০.৫	মাইনাস শূন্য দশমিক পাঁচ
+20	leading zero	০০৭	শূন্য শূন্য সাত
+21	punctuation	১২, ১৩।	বারো, তেরো।
+22	quantity	১৯৭১ জন	এক হাজার নয়শো একাত্তর জন
+23	year	১৯৭১ সালে	উনিশশো একাত্তর সালে
+24	year	১৯০০ সাল	উনিশশো সাল
+25	year	২০২৬ সালে	দুই হাজার ছাব্বিশ সালে
+26	year	16 ডিসেম্বর 1971 সালে	ষোলো ডিসেম্বর উনিশশো একাত্তর সালে
+27	date	২১/০২/২০২৬	একুশ ফেব্রুয়ারি দুই হাজার ছাব্বিশ
+28	date	2026-02-21	একুশ ফেব্রুয়ারি দুই হাজার ছাব্বিশ
+29	date	১৬-১২-১৯৭১	ষোলো ডিসেম্বর উনিশশো একাত্তর
+30	date	29/02/2024	ঊনত্রিশ ফেব্রুয়ারি দুই হাজার চব্বিশ
+31	date, invalid	৩১/০২/২০২৬	৩১/০২/২০২৬
+32	date, invalid	29/02/2025	29/02/2025
+33	time	৯:০০	নয়টা
+34	time	09:05	নয়টা পাঁচ
+35	time	১৩:৩০	তেরোটা ত্রিশ
+36	time	০০:০০	শূন্যটা
+37	time	২৩:৫৯	তেইশটা ঊনষাট
+38	time, invalid	24:00	24:00
+39	time, invalid	12:60	12:60
+40	currency	৳৫০০	পাঁচশো টাকা
+41	currency	৳ ১,২৫০.৫০	এক হাজার দুইশো পঞ্চাশ টাকা পঞ্চাশ পয়সা
+42	currency	Tk 25	পঁচিশ টাকা
+43	currency	Tk. 25.5	পঁচিশ টাকা পঞ্চাশ পয়সা
+44	currency	BDT 100.05	একশো টাকা পাঁচ পয়সা
+45	currency	১০০ টাকা	একশো টাকা
+46	currency	25 BDT	পঁচিশ টাকা
+47	currency	৳০.৫০	শূন্য টাকা পঞ্চাশ পয়সা
+48	currency	৳১০.০০	দশ টাকা
+49	currency	৳-৫	মাইনাস পাঁচ টাকা
+50	currency, invalid	৳১.২৩৪	৳১.২৩৪
+51	percent	৫০%	পঞ্চাশ শতাংশ
+52	percent	2.5 %	দুই দশমিক পাঁচ শতাংশ
+53	percent	০.০৫%	শূন্য দশমিক শূন্য পাঁচ শতাংশ
+54	percent	-5%	মাইনাস পাঁচ শতাংশ
+55	ordinal	১ম	প্রথম
+56	ordinal	২য়	দ্বিতীয়
+57	ordinal	৩য়	তৃতীয়
+58	ordinal	4র্থ	চতুর্থ
+59	ordinal	৫ম	পঞ্চম
+60	ordinal	৬ষ্ঠ	ষষ্ঠ
+61	ordinal	৭ম	সপ্তম
+62	ordinal	৮ম	অষ্টম
+63	ordinal	৯ম	নবম
+64	ordinal	১০ম	দশম
+65	ordinal	1st	প্রথম
+66	ordinal	2nd	দ্বিতীয়
+67	ordinal	3rd	তৃতীয়
+68	ordinal	10th	দশম
+69	ordinal	২১তম	একুশতম
+70	phone	01712345678	শূন্য এক সাত এক দুই, তিন চার পাঁচ, ছয় সাত আট
+71	phone	০১৭১২-৩৪৫৬৭৮	শূন্য এক সাত এক দুই, তিন চার পাঁচ, ছয় সাত আট
+72	phone	+8801712345678	প্লাস আট আট শূন্য, এক সাত এক দুই, তিন চার পাঁচ, ছয় সাত আট
+73	phone	+৮৮০ ১৭১২ ৩৪৫ ৬৭৮	প্লাস আট আট শূন্য, এক সাত এক দুই, তিন চার পাঁচ, ছয় সাত আট
+74	abbreviation	ডা. রহমান	ডাক্তার রহমান
+75	abbreviation	ড. সেন	ডক্টর সেন
+76	abbreviation	মো. করিম	মোহাম্মদ করিম
+77	abbreviation	প্রফে. বসু	প্রফেসর বসু
+78	abbreviation	Dr. Rahman	ডক্টর Rahman
+79	code-mix	আজ meeting আছে।	আজ meeting আছে।
+80	code-mix	ami 2 cup cha খাবো।	ami দুই cup cha খাবো।
+81	protected	GPT-4o এবং Python3.12	GPT-4o এবং Python3.12
+82	protected	https://example.org/v2?a=12	https://example.org/v2?a=12
+83	protected	user01@example.com	user01@example.com
+84	invalid grouping	১,২,৩	১,২,৩

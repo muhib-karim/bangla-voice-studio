@@ -13,3 +13,12 @@ All skill paths below were read from the installed `~/.codex/skills` tree. This 
 - [ponytail](~/.codex/skills/ponytail/SKILL.md) — Removed Redis/Celery, frontend build tooling, plugin marketplace, waveform editor and speculative abstractions; retained every required v1 workflow, one serial worker, polling, and explicit limits/evidence gates.
 
 Availability note: all eight requested skill documents were available. Graphify's executable/importable package was not available; the additional Understand fallback also lacked a usable runtime in checked locations. No proxy, third-party token handoff, dependency installer, model download, or model inference was used. UI search output was not persisted as a third file.
+
+## Build session (Claude Code)
+
+Installed skill sources: `/home/user/harness/codex_home/skills/<name>/SKILL.md`.
+
+- ponytail — scope — kept one SQLite queue, one worker, plain ES modules, and existing normaliser; decisions in `docs/BUILD_LOG.md`.
+- executing-plans — implementation sequence — `docs/BUILD_LOG.md` records results and departures from planning-only/commit steps.
+- agent-skills-test-driven-development — behavior — each new test file precedes its module; focused RED/GREEN runs, CI-only browser/model exceptions recorded.
+- api-and-interface-design — contracts/routes — `contracts.py`, `web/schemas.py`, consistent errors and idempotency in `jobs/store.py`.

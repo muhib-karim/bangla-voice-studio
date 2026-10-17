@@ -13,8 +13,8 @@
 - Favicon moved from a `data:` URI to a static file so the CSP does not block it.
 
 ## Deferred to M3 / needs external evidence
-- `models-smoke.yml` (MMS-TTS + faster-whisper round trip, CER table) has not run yet; the README results section stays a placeholder until it does.
+- `models-smoke.yml` (MMS-TTS + faster-whisper round trip) has run green on Python 3.11 and 3.12 and the README carries its CER table. Whisper `small` returns Devanagari script for this Bangla audio, so a larger Whisper model still needs a Bengali-script CER measurement.
 - Indic-Parler-TTS, IndicF5 and OmniVoice adapters are written against their documented APIs but are not exercised in CI (too heavy for CPU runners). VoxCPM2-Bangla is registered as unavailable.
-- Docker images are built only by `docker.yml` on pull requests and tags; not yet run.
+- Docker images are built by `docker.yml` on pull requests and tags (green from v0.1.0 on); the CUDA image is a build recipe only and is not exercised.
 - Native-speaker review of the normaliser output and an accessibility pass on the UI.
 - Model licenses marked "verify on the model card" in `docs/MODEL_LICENSES.md` still need a manual check before any commercial use.

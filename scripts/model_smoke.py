@@ -157,6 +157,8 @@ def run(phase: str, engine_id: str, cache: Path, output: Path) -> None:
                         "asr_seconds": time.monotonic() - begin,
                     }
                 )
+                for warning in transcript.warnings:
+                    print(f"WARNING {sample['id']}: {warning}", flush=True)
                 budget(cache)
         finally:
             signal.alarm(0)
@@ -172,6 +174,9 @@ def run(phase: str, engine_id: str, cache: Path, output: Path) -> None:
                 "Scoring: NFC, lowercase, remove whitespace and Unicode punctuation, codepoint edit distance / reference length.",
             ]
         )
+        warned = sorted({w for row in rows for w in row["transcript"].get("warnings", ())})
+        if warned:
+            table.extend(["", "Transcript warnings:", *[f"- {w}" for w in warned]])
         (output / "CER.md").write_text("\n".join(table) + "\n")
     else:
         raise ValueError("Unknown smoke phase")

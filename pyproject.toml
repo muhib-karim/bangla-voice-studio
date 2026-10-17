@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "bangla-voice-studio"
-version = "0.1.1"
+version = "0.1.2"
 description = "Local Bangla text preparation, speech jobs, and captions"
 readme = "README.md"
 requires-python = ">=3.11"

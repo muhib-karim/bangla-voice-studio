@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0 — 2026-10-17 (development draft)
+## 0.1.0 — 2026-10-18
 
 - Bangla normalization with the PLAN examples and local upstream regression fixtures.
 - Sentence splitting, bounded text chunks, chapter detection and frame-based SRT/VTT output.

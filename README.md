@@ -77,11 +77,24 @@ Downloads are explicit and serialized. Inference loads local snapshots only. A m
 
 See [model licenses](docs/MODEL_LICENSES.md). Extras are separate environments when upstream dependencies conflict; there is no `all` extra. Rates, disk/RAM/VRAM and commercial permission must not be inferred from a model's name. Larger engines require a remote GPU audit. EPUB and IndicConformer are not included.
 
-## RESULTS — operator placeholder
+## RESULTS: model smoke test (v0.1.1)
 
 <!-- RESULTS -->
 
-Measured comparison: **not measured**. The operator will insert provenance-checked results here. The five-sentence smoke CER table is a workflow artifact, not the promised benchmark. Round-trip ASR CER measures text recoverability under one recognizer, not naturalness or speaker similarity. The inspected upstream set has 50 unique sentences; 61 latency rows include repeated input variants. A 61-sentence comparison requires a verified 61-ID cohort.
+Measured on GitHub Actions (CPU runners), `models-smoke` workflow on the v0.1.1 fix branch, all 4 jobs green: MMS-TTS synthesis and faster-whisper round trip, each on Python 3.11 and 3.12. Five Bangla sentences, synthesized with MMS-TTS (`facebook/mms-tts-ben`), then transcribed by Whisper `small` with `language="bn"`.
+
+| Measure | Python 3.11 | Python 3.12 |
+|---|---|---|
+| MMS-TTS synthesis, 5 sentences (about 2 s of audio each) | ok | ok, 9.0 s wall time, 0.65 to 0.74 s per sentence, 645 MB peak memory |
+| Round-trip CER, raw (Bengali reference vs Whisper output) | 104.3% | 104.3% |
+| Round-trip CER, Whisper output mapped from Devanagari to Bengali codepoints | 40.4% | 41.5% |
+
+What the numbers say:
+
+- **Whisper `small` writes Bangla speech in Devanagari script**, even with `language="bn"`. For example, `আমি বাংলায় কথা বলি।` comes back as `आमी बाँनाई कोता बोली`, which is a close phonetic match in the wrong script. The raw CER above about 100% is therefore a script mismatch, not unintelligible audio.
+- The mapped CER moves each Devanagari character to the Bengali character at the same offset (the two Unicode blocks are laid out in parallel) and scores again. It is a rough read on how much of the speech Whisper heard, not a formal benchmark: 94 reference characters, 5 sentences, one recognizer.
+- Scoring: NFC, lowercase, whitespace and Unicode punctuation removed, codepoint edit distance divided by reference length, summed over the 5 sentences.
+- Not measured: naturalness, speaker similarity, and the 50-sentence comparison. For Bangla transcription inside the app, a larger Whisper model is the practical choice; `small` is the smoke-test model because it fits a CPU runner.
 
 ## CLI examples
 

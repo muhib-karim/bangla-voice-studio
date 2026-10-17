@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Model smoke test: print transcript warnings (such as the Devanagari-script warning) in the job log and list them under the CER table, so they show without opening the JSON report.
+
 ## 0.1.2 — 2026-10-18
 
 - Warn when Bangla transcription comes back in Devanagari script. The v0.1.1 model smoke test showed Whisper small does this for MMS-TTS Bangla audio even with `language="bn"`; the transcript now carries a warning instead of passing silently.

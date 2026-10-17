@@ -27,8 +27,8 @@ jobs:
       BVS_OFFLINE: '1'
       HF_HUB_OFFLINE: '1'
       TRANSFORMERS_OFFLINE: '1'
-      BVS_DATA_DIR: ${{ runner.temp }}/bvs-e2e
-      BVS_MODEL_CACHE: ${{ runner.temp }}/bvs-empty-models
+      BVS_DATA_DIR: /tmp/bvs-e2e
+      BVS_MODEL_CACHE: /tmp/bvs-empty-models
       BVS_BASE_URL: http://127.0.0.1:8000
       OPENBLAS_NUM_THREADS: '1'
       OMP_NUM_THREADS: '1'

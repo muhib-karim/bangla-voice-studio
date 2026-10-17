@@ -25,8 +25,8 @@ jobs:
       BVS_OFFLINE: '1'
       HF_HUB_OFFLINE: '1'
       TRANSFORMERS_OFFLINE: '1'
-      BVS_DATA_DIR: ${{ runner.temp }}/bvs-data
-      BVS_MODEL_CACHE: ${{ runner.temp }}/bvs-models
+      BVS_DATA_DIR: /tmp/bvs-data
+      BVS_MODEL_CACHE: /tmp/bvs-models
       OMP_NUM_THREADS: '1'
       OPENBLAS_NUM_THREADS: '1'
     steps:

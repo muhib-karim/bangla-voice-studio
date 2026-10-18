@@ -13,6 +13,7 @@ from typing import Any
 from uuid import uuid4
 
 from bvs.captions import Cue, render_srt, render_vtt
+from bvs.chunk_cache import ChunkCache, chunk_key
 from bvs.contracts import (
     ASRRequest,
     Progress,
@@ -177,6 +178,8 @@ def run(data: dict[str, Any], workspace: Path, context: RunContext) -> dict[str,
     chapter_paths = []
     clock = completed = 0
     rate = 24000
+    book_cache = ChunkCache(workspace.parent.parent / "chunk-cache") if is_book else None
+    reference_digest = sha256(reference.wav_path) if reference else None
     try:
         context.report(Progress("loading", 0, None, "steps", "Loading engine"))
         engine.load(config, context)
@@ -191,21 +194,40 @@ def run(data: dict[str, Any], workspace: Path, context: RunContext) -> dict[str,
                     if context.is_cancelled():
                         raise BVSError("CANCELLED", "Rendering cancelled")
                     path = workspace / f"unit-{chapter_index}-{sentence_index}-{fragment_index}.wav"
-                    synthesized = engine.synthesize(
-                        SynthesisRequest(
-                            spoken,
-                            payload["language"],
-                            reference,
-                            payload.get("voice_description"),
-                            payload["seed"],
-                        ),
-                        output_path=path,
-                        context=context,
+                    key = chunk_key(
+                        engine_id=spec.id,
+                        model_id=job["model_id"],
+                        model_revision=job["model_revision"],
+                        text=spoken,
+                        language=payload["language"],
+                        reference=reference_digest,
+                        reference_transcript=reference.transcript if reference else None,
+                        voice_description=payload.get("voice_description"),
+                        seed=payload["seed"],
                     )
-                    warnings.update(synthesized.warnings)
-                    path = (
-                        path if native else canonical_wav(path, path.with_name("pcm-" + path.name))
-                    )
+                    cached = path.with_name("pcm-" + path.name)
+                    if book_cache is not None and book_cache.fetch(key, cached):
+                        path = cached
+                    else:
+                        synthesized = engine.synthesize(
+                            SynthesisRequest(
+                                spoken,
+                                payload["language"],
+                                reference,
+                                payload.get("voice_description"),
+                                payload["seed"],
+                            ),
+                            output_path=path,
+                            context=context,
+                        )
+                        warnings.update(synthesized.warnings)
+                        path = (
+                            path
+                            if native
+                            else canonical_wav(path, path.with_name("pcm-" + path.name))
+                        )
+                        if book_cache is not None:
+                            book_cache.store(key, path)
                     audio = inspect_wav(path)
                     rate = audio.sample_rate_hz
                     all_cues.append(
@@ -272,11 +294,11 @@ def run(data: dict[str, Any], workspace: Path, context: RunContext) -> dict[str,
             type="audiobook",
             chapters=chapter_results,
             artifacts=files,
-            cache_hits=0,
+            cache_hits=book_cache.hits if book_cache is not None else 0,
             warnings=sorted(
                 warnings
                 | {
-                    "Chunk-cache resume and encoded exports are deferred to M3; resuming rerenders the book."
+                    "Encoded MP3/M4B exports are deferred to M3.3; resuming reuses verified cached chunks."
                 }
             ),
         )

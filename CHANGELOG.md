@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.3.0 — 2026-10-18
 
 - Exports: per-chapter MP3 (128 kbps mono), chaptered AAC-in-M4B (64 kbps mono) with escaped UTF-8 ffmetadata titles and contiguous chapter marks, and speech MP3; encoded files are written atomically and a missing ffmpeg fails before rendering (PLAN M3.3).
 - Studio and CLI: audio-format choices on Speak, Clone and Audiobook (MP3 per chapter and a chaptered M4B, on by default for books when ffmpeg is present); `bvs say`/`bvs clone` write MP3 when the output ends in .mp3; book results show how many verified cached chunks were reused.

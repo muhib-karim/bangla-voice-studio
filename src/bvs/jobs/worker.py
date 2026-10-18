@@ -175,7 +175,7 @@ def run(data: dict[str, Any], workspace: Path, context: RunContext) -> dict[str,
     native = total == 1 and not reference and not is_book and not shutil.which("ffmpeg")
     warnings: set[str] = set()
     all_cues: list[Cue] = []
-    chapter_results = []
+    chapter_results: list[dict[str, Any]] = []
     chapter_paths = []
     clock = completed = 0
     rate = 24000
@@ -321,6 +321,8 @@ def run(data: dict[str, Any], workspace: Path, context: RunContext) -> dict[str,
         mp3 = encode_audio(output, output.with_suffix(".mp3"), "mp3")
         files.append(artifact(mp3, "audio/mpeg", duration=duration, notes=notes))
     files += captions(cues, payload["captions"], output)
+    if is_book and book_cache is not None and book_cache.hits:
+        warnings.add(f"Reused {book_cache.hits} verified cached chunks.")
     if is_book:
         return dict(
             type="audiobook",

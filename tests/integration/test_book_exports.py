@@ -12,7 +12,6 @@ import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
-from bvs import media
 from bvs.config import Settings
 from bvs.errors import BVSError
 from bvs.media import encode_audio, ffmetadata, write_wav
@@ -113,7 +112,7 @@ def test_failed_export_leaves_no_partial_file(tmp_path: Path) -> None:
 
 
 def test_missing_ffmpeg_is_reported(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(media.shutil, "which", lambda _name: None)
+    monkeypatch.setattr(shutil, "which", lambda _name: None)
     with pytest.raises(BVSError) as err:
         encode_audio(tmp_path / "x.wav", tmp_path / "x.mp3", "mp3")
     assert err.value.code == "EXTRA_MISSING"

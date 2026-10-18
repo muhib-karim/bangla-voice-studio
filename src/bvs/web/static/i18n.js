@@ -35,6 +35,7 @@ const messages = {
   capability: ['সুবিধা', 'Capabilities'], size: ['মডেলের আকার', 'Model size'], unknown: ['অজানা', 'Unknown'],
   emptyTranscript: ['কথা শনাক্ত হয়নি।', 'No speech detected.'],
   formats: ['এই সংস্করণে WAV অডিও, SRT ও VTT আছে। MP3/M4B পরে যোগ হবে।', 'This version exports WAV, SRT and VTT. MP3/M4B are deferred.'],
+  cacheHits: ['আগের যাচাই করা ক্যাশ অংশ পুনর্ব্যবহার', 'Reused cached chunks'],
   remove: ['অডিও সরান', 'Remove audio'], loading: ['লোড হচ্ছে…', 'Loading…'],
 };
 export function t(key) { return messages[key]?.[locale === 'en' ? 1 : 0] ?? key; }

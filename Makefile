@@ -3,7 +3,7 @@ RUFF := .venv/bin/ruff
 MYPY := .venv/bin/mypy
 EXTRAS ?=
 
-.PHONY: install test lint serve
+.PHONY: install test lint serve wheel docker docker-smoke docker-cuda
 
 install:
 	@command -v uv >/dev/null || { echo 'Install uv first; this target does not download installers.'; exit 1; }
@@ -19,3 +19,15 @@ lint:
 
 serve:
 	$(PYTHON) -m bvs serve
+
+wheel:
+	$(PYTHON) -m build --outdir dist
+
+docker:
+	docker build --target runtime -t bvs:cpu .
+
+docker-smoke: docker
+	bash scripts/container_smoke.sh bvs:cpu
+
+docker-cuda:
+	docker build -f Dockerfile.cuda --target runtime -t bvs:cuda .

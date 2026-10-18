@@ -6,6 +6,7 @@
 - Audiobooks: verified chunk cache (PLAN M3.2). Each rendered unit is stored under a key of engine, model revision, spoken text, language, reference audio, voice description and seed, committed atomically with a digest. Re-rendering or resuming a book reuses verified chunks and reports `cache_hits`; a corrupt or truncated chunk is dropped and rendered again, and any change to those inputs misses the cache.
 - Tests: integration test that parses exported SRT and VTT independently and checks the cue times are monotonic, identical across formats, and end within the audio (PLAN M3.1).
 - Model smoke test: print transcript warnings (such as the Devanagari-script warning) in the job log and list them under the CER table, so they show without opening the JSON report.
+- Tests: resuming a cancelled audiobook through the jobs API reuses the chunks already in the verified cache and renders only the rest; a finished book cannot be resumed (PLAN M3.2).
 
 ## 0.1.2 — 2026-10-18
 

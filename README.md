@@ -110,7 +110,7 @@ bvs engines download mms
 
 `bvs download mms` is the same explicit download command. A reference must be a mono PCM16 WAV, 3–30 seconds and at most 20 MB; transcription accepts that WAV format up to 2 hours/250 MB. Books accept UTF-8 text/Markdown up to 1 MB. Use a voice you have permission to use.
 
-Output files are not overwritten unless `--overwrite` is given. Ctrl-C requests cancellation and reports the job ID. `bvs audiobook --resume JOB_ID` links a new job to the saved request and reuses verified cached chunks, so only the missing parts are rendered. `--formats wav,mp3,m4b` adds an MP3 per chapter and one chaptered M4B (AAC, needs ffmpeg); `bvs say ... --output speech.mp3` writes MP3. Chapter-local captions and broader media decoding are later M3 work. TTS caption times come from PCM frames, not estimated word alignment.
+Output files are not overwritten unless `--overwrite` is given. Ctrl-C requests cancellation and reports the job ID. `bvs audiobook --resume JOB_ID` links a new job to the saved request and reuses verified cached chunks, so only the missing parts are rendered. `--formats wav,mp3,m4b` adds an MP3 per chapter and one chaptered M4B (AAC, needs ffmpeg); `bvs say ... --output speech.mp3` writes MP3. Books also get chapter-local SRT/VTT (each starting at 00:00) and a `manifest.json` listing chapters, times and file hashes. Broader media decoding is later M3 work. TTS caption times come from PCM frames, not estimated word alignment.
 
 ## Local API and containers
 

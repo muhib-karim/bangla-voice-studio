@@ -32,7 +32,7 @@ def _cues(text: str, pattern: re.Pattern[str]) -> list[tuple[int, int]]:
 
 def _wav_ms(path: Path) -> float:
     with wave.open(str(path)) as handle:
-        return handle.getnframes() * 1000 / handle.getframerate()
+        return float(handle.getnframes() * 1000 / handle.getframerate())
 
 
 def _assert_timeline(cues: list[tuple[int, int]], audio_ms: float) -> None:

@@ -24,7 +24,7 @@ from bvs.contracts import (
 )
 from bvs.download import atomic_json, download_model, sha256
 from bvs.errors import BVSError
-from bvs.media import concatenate_wav, inspect_wav
+from bvs.media import concatenate_wav, encode_audio, inspect_wav
 from bvs.normalise import normalise
 from bvs.registry import create_asr, create_tts, get_spec
 from bvs.text import chunk_sentence, detect_chapters, split_sentences
@@ -150,6 +150,7 @@ def run(data: dict[str, Any], workspace: Path, context: RunContext) -> dict[str,
     if ref := payload.get("reference"):
         reference = ReferenceAudio(Path(ref["path"]), ref["transcript"], ref["language"])
     is_book = job["kind"] == "audiobook"
+    formats = list(dict.fromkeys(payload.get("formats") or ["wav"]))
     text = payload.get("text") or Path(payload["upload_path"]).read_text(encoding="utf-8-sig")
     chapters = detect_chapters(text, format="md") if is_book else ()
     groups = (
@@ -259,17 +260,27 @@ def run(data: dict[str, Any], workspace: Path, context: RunContext) -> dict[str,
             chapter_audio = concatenate_wav(sentence_paths, chapter_path, pause_frames=3600)
             chapter_paths.append(chapter_path)
             if is_book:
+                chapter_files = [
+                    artifact(chapter_path, "audio/wav", duration=chapter_audio.frames / rate)
+                ]
+                if "mp3" in formats:
+                    chapter_mp3 = encode_audio(
+                        chapter_path,
+                        chapter_path.with_suffix(".mp3"),
+                        "mp3",
+                        title=title,
+                        author=payload.get("author", ""),
+                    )
+                    chapter_files.append(
+                        artifact(chapter_mp3, "audio/mpeg", duration=chapter_audio.frames / rate)
+                    )
                 chapter_results.append(
                     dict(
                         index=chapter_index,
                         title=title,
                         start_ms=chapter_start * 1000 // rate,
                         end_ms=clock * 1000 // rate,
-                        artifacts=[
-                            artifact(
-                                chapter_path, "audio/wav", duration=chapter_audio.frames / rate
-                            )
-                        ],
+                        artifacts=chapter_files,
                     )
                 )
                 if chapter_index < len(plans) - 1:
@@ -285,22 +296,38 @@ def run(data: dict[str, Any], workspace: Path, context: RunContext) -> dict[str,
         final_audio = inspect_wav(output)
     cues = tuple(all_cues)
     notes = [f"{spec.license.identifier}; commercial use: {spec.license.commercial_use}"]
-    files = [
-        artifact(output, "audio/wav", duration=final_audio.frames / rate, notes=notes),
-        *captions(cues, payload["captions"], output),
-    ]
+    duration = final_audio.frames / rate
+    files = [artifact(output, "audio/wav", duration=duration, notes=notes)]
+    if is_book and "m4b" in formats:
+        # MP4 chapters are contiguous: each chapter runs until the next one starts, so the
+        # pause between chapters belongs to the chapter before it and the last one runs to
+        # the end of the book.
+        starts = [int(c["start_ms"]) for c in chapter_results]
+        total_ms = max(int(chapter_results[-1]["end_ms"]), round(duration * 1000))
+        marks = [
+            (str(c["title"]), start, end)
+            for c, start, end in zip(chapter_results, starts, [*starts[1:], total_ms], strict=True)
+        ]
+        book = encode_audio(
+            output,
+            output.with_suffix(".m4b"),
+            "m4b",
+            chapters=marks,
+            title=payload.get("title", ""),
+            author=payload.get("author", ""),
+        )
+        files.append(artifact(book, "audio/mp4", duration=duration, notes=notes))
+    if not is_book and "mp3" in formats:
+        mp3 = encode_audio(output, output.with_suffix(".mp3"), "mp3")
+        files.append(artifact(mp3, "audio/mpeg", duration=duration, notes=notes))
+    files += captions(cues, payload["captions"], output)
     if is_book:
         return dict(
             type="audiobook",
             chapters=chapter_results,
             artifacts=files,
             cache_hits=book_cache.hits if book_cache is not None else 0,
-            warnings=sorted(
-                warnings
-                | {
-                    "Encoded MP3/M4B exports are deferred to M3.3; resuming reuses verified cached chunks."
-                }
-            ),
+            warnings=sorted(warnings),
         )
     return dict(
         type="speech", artifacts=files, cues=[asdict(c) for c in cues], warnings=sorted(warnings)

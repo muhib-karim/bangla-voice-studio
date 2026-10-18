@@ -149,8 +149,7 @@ class Service:
                 self._upload(data["upload_id"], "transcription")
             if isinstance(payload, AudiobookInput):
                 self.book_preview(payload)
-            if any(f != "wav" for f in data.get("formats", [])):
-                raise BVSError("EXPORT_FAILED", "MP3/M4B export is deferred to M3; select WAV")
+            encoded = any(f != "wav" for f in data.get("formats", []))
             if kind in {"speech", "clone"}:
                 sentences = split_sentences(data["text"])
                 units = [
@@ -161,13 +160,14 @@ class Service:
                         max_chars=cap.max_text_chars or 300,
                     )
                 ]
-                native = len(units) == 1 and not data.get("reference")
+                native = len(units) == 1 and not data.get("reference") and not encoded
             else:
                 native = False
             if not native and not shutil.which("ffmpeg"):
                 raise BVSError(
                     "EXTRA_MISSING",
-                    "Install ffmpeg for multi-unit speech, references, transcription, and books",
+                    "Install ffmpeg for multi-unit speech, references, transcription, books, "
+                    "and MP3/M4B export",
                 )
             view = engine_view(spec, self.settings.model_cache_dir, offline=self.settings.offline)
             if view["availability"] != "ready":

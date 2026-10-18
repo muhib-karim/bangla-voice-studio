@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Exports: per-chapter MP3 (128 kbps mono), chaptered AAC-in-M4B (64 kbps mono) with escaped UTF-8 ffmetadata titles and contiguous chapter marks, and speech MP3; encoded files are written atomically and a missing ffmpeg fails before rendering (PLAN M3.3).
+
 ## 0.2.0 — 2026-10-18
 
 - Tests: chapter detection cases for plain-text অধ্যায়/পরিচ্ছেদ headings in both Unicode spellings, sentence lines that only start with a heading word, word headings outranking numbered lines, bare Bengali-digit headings with a title line, Markdown front matter, tilde fences and links, blank input and EPUB refusal (PLAN M3.2).

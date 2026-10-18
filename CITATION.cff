@@ -2,8 +2,8 @@ cff-version: 1.2.0
 message: "If you use Bangla Voice Studio, please cite this software."
 type: software
 title: Bangla Voice Studio
-version: 0.1.2
-date-released: '2026-10-17'
+version: 0.2.0
+date-released: '2026-10-18'
 authors:
   - given-names: Muhib
     family-names: Karim

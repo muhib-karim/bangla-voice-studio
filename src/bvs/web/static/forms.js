@@ -45,6 +45,14 @@ export function workspace(kind, engines, health) {
   const pause = isBook ? field(options, 'chapter_pause_ms', 'pause', 'input', { type: 'number', min: 0, max: 5000, value: 750 }) : null;
   const captionSet = el('fieldset', {}, label(el('legend'), 'captions')); captionSet.id = form.id + '-captions'; options.append(captionSet);
   const srt = checkbox(captionSet, 'srt', 'SRT'), vtt = checkbox(captionSet, 'vtt', 'VTT');
+  let mp3 = null, m4b = null;
+  if (!isASR) {
+    const formatSet = el('fieldset', {}, label(el('legend'), 'audioFormats')); formatSet.id = form.id + '-formats'; form.append(formatSet);
+    checkbox(formatSet, 'wav', 'WAV').disabled = true;
+    mp3 = checkbox(formatSet, 'mp3', isBook ? 'mp3Chapters' : 'MP3', isBook && !!health.ffmpeg_available);
+    m4b = isBook ? checkbox(formatSet, 'm4b', 'm4bBook', !!health.ffmpeg_available) : null;
+    if (!health.ffmpeg_available) for (const control of [mp3, m4b].filter(Boolean)) control.disabled = true;
+  }
   form.append(label(el('p', { class: 'help' }), 'formats'));
   const preview = el('section', { 'data-testid': 'preview', hidden: true, 'aria-live': 'polite' });
   const previewButton = !isASR ? button(isBook ? 'chapters' : 'preview') : null;
@@ -97,7 +105,7 @@ export function workspace(kind, engines, health) {
       const data = { engine_id: engineSelect.value, language: language.value === 'auto' ? null : language.value, captions: [srt.checked && 'srt', vtt.checked && 'vtt'].filter(Boolean) };
       if (isASR) Object.assign(data, { upload_id: (await upload(sourceFile.files[0], 'transcription')).id, word_timestamps: words.checked });
       else {
-        Object.assign(data, { text: text.value, normalize: normalized.checked, seed: Number(seed.value), formats: ['wav'] });
+        Object.assign(data, { text: text.value, normalize: normalized.checked, seed: Number(seed.value), formats: ['wav', mp3?.checked && 'mp3', m4b?.checked && 'm4b'].filter(Boolean) });
         if (!description.disabled && description.value.trim()) data.voice_description = description.value;
         if (isClone) data.reference = { upload_id: (await upload(reference.files[0], 'reference')).id, transcript: referenceText.value, language: language.value };
         if (isBook) { delete data.text; Object.assign(data, await bookSource(), { title: form.elements.title.value, author: form.elements.author.value, max_chars: Number(maxChars.value), chapter_pause_ms: Number(pause.value) }); }

@@ -36,6 +36,7 @@ export function jobPanel() {
     const audio = (data.artifacts ?? []).find(a => a.media_type === 'audio/wav');
     if (audio) result.append(el('p', { text: `${audio.duration_seconds?.toFixed(2) ?? ''} s` }), el('audio', { controls: true, src: audio.download_url, preload: 'metadata', 'aria-label': audio.name }));
     result.append(files(data.artifacts ?? []));
+    if (data.type === 'audiobook') result.append(el('p', { 'data-testid': 'cache-hits', text: `${t('cacheHits')}: ${data.cache_hits ?? 0}` }));
     for (const chapter of data.chapters ?? []) {
       result.append(el('h3', { text: chapter.title }), files(chapter.artifacts));
     }

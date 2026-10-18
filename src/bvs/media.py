@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import os
+import shutil
+import subprocess
 import tempfile
 import wave
 from collections.abc import Sequence
@@ -100,3 +102,89 @@ def concatenate_wav(
     finally:
         temporary.unlink(missing_ok=True)
     return inspect_wav(output_path)
+
+
+def _ffmetadata_escape(value: str) -> str:
+    """Escape a value for an ffmetadata file (``=``, ``;``, ``#``, ``\\`` and newlines)."""
+    out = []
+    for char in value:
+        if char in "=;#\\\n":
+            out.append("\\")
+        out.append(char)
+    return "".join(out)
+
+
+def ffmetadata(
+    chapters: Sequence[tuple[str, int, int]], *, title: str = "", author: str = ""
+) -> str:
+    """Render UTF-8 ffmetadata with millisecond chapters given as (title, start_ms, end_ms)."""
+    lines = [";FFMETADATA1"]
+    if title:
+        lines.append("title=" + _ffmetadata_escape(title))
+        lines.append("album=" + _ffmetadata_escape(title))
+    if author:
+        lines.append("artist=" + _ffmetadata_escape(author))
+    previous = 0
+    for name, start_ms, end_ms in chapters:
+        if start_ms < previous or end_ms <= start_ms:
+            raise BVSError("EXPORT_FAILED", "Chapter times must be increasing")
+        previous = end_ms
+        lines += [
+            "[CHAPTER]",
+            "TIMEBASE=1/1000",
+            f"START={start_ms}",
+            f"END={end_ms}",
+            "title=" + _ffmetadata_escape(name),
+        ]
+    return "\n".join(lines) + "\n"
+
+
+def encode_audio(
+    source: Path,
+    output_path: Path,
+    fmt: str,
+    *,
+    chapters: Sequence[tuple[str, int, int]] = (),
+    title: str = "",
+    author: str = "",
+    timeout: float = 3600,
+) -> Path:
+    """Encode a canonical WAV as MP3 (128 kbps mono) or chaptered AAC-in-M4B (64 kbps mono).
+
+    The output is written to a temporary file and moved into place only after ffmpeg
+    succeeds, so a failed or cancelled export never leaves a truncated file behind.
+    """
+    if fmt not in {"mp3", "m4b"}:
+        raise BVSError("EXPORT_FAILED", "Unsupported export format")
+    executable = shutil.which("ffmpeg")
+    if not executable:
+        raise BVSError("EXTRA_MISSING", "Install ffmpeg for MP3/M4B export")
+    info = inspect_wav(source)
+    temporary = output_path.with_name(output_path.name + ".part")
+    meta = output_path.with_name(output_path.name + ".ffmeta")
+    command = [executable, "-nostdin", "-v", "error", "-y", "-i", str(source)]
+    try:
+        if fmt == "m4b":
+            meta.write_text(ffmetadata(chapters, title=title, author=author), encoding="utf-8")
+            command += ["-f", "ffmetadata", "-i", str(meta), "-map", "0:a"]
+            command += ["-map_metadata", "1", "-map_chapters", "1"]
+            command += ["-c:a", "aac", "-b:a", "64k", "-ac", "1", "-ar", str(info.sample_rate_hz)]
+            command += ["-movflags", "+faststart", "-f", "mp4", str(temporary)]
+        else:
+            command += ["-map", "0:a", "-c:a", "libmp3lame", "-b:a", "128k", "-ac", "1"]
+            command += ["-ar", str(info.sample_rate_hz), "-id3v2_version", "3"]
+            if title:
+                command += ["-metadata", "title=" + title]
+            if author:
+                command += ["-metadata", "artist=" + author]
+            command += ["-f", "mp3", str(temporary)]
+        subprocess.run(command, check=True, capture_output=True, timeout=timeout)
+        if not temporary.exists() or temporary.stat().st_size == 0:
+            raise BVSError("EXPORT_FAILED", "Encoder produced no output")
+        os.replace(temporary, output_path)
+    except (subprocess.SubprocessError, OSError) as exc:
+        raise BVSError("EXPORT_FAILED", f"{fmt.upper()} export failed") from exc
+    finally:
+        temporary.unlink(missing_ok=True)
+        meta.unlink(missing_ok=True)
+    return output_path

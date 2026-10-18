@@ -69,3 +69,33 @@ def test_corrupt_chunk_is_rerendered(client: TestClient, tmp_path: Path) -> None
     assert again["cache_hits"] == UNITS - 1
     assert _timeline(again) == _timeline(first)
     assert len(sorted(tmp_path.rglob("chunk-cache/*/*.wav"))) == UNITS
+
+
+def test_resumed_book_reuses_chunks_finished_before_it_stopped(tmp_path: Path) -> None:
+    app = create_app(Settings(data_dir=tmp_path, model_cache_dir=tmp_path / "models", demo=True))
+    # Until the app starts its supervisor a submitted book stays queued, so cancelling it
+    # is deterministic.
+    idle = TestClient(app)
+    response = idle.post(
+        "/api/v1/audiobooks",
+        json={"engine_id": "dummy", "text": BOOK, "title": "বই", "formats": ["wav"]},
+    )
+    assert response.status_code == 202, response.text
+    stopped = response.json()["id"]
+    cancelled = idle.post(f"/api/v1/jobs/{stopped}/cancellations", json={})
+    assert cancelled.json()["state"] == "cancelled"
+
+    with TestClient(app) as client:
+        first = _render(client)
+        entries = sorted(tmp_path.rglob("chunk-cache/*/*.wav"))
+        assert len(entries) == UNITS
+        for entry in entries[:2]:
+            entry.unlink()  # only the other chunks count as finished
+        resumed = client.post(f"/api/v1/jobs/{stopped}/resumptions", json={})
+        assert resumed.status_code == 202, resumed.text
+        job = finish(client, resumed.json()["id"])
+        assert job["result"]["cache_hits"] == UNITS - 2
+        assert _timeline(job["result"]) == _timeline(first)
+        assert len(sorted(tmp_path.rglob("chunk-cache/*/*.wav"))) == UNITS
+        again = client.post(f"/api/v1/jobs/{job['id']}/resumptions", json={})
+        assert again.status_code == 409, again.text

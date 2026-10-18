@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 — 2026-10-18
 
 - Tests: chapter detection cases for plain-text অধ্যায়/পরিচ্ছেদ headings in both Unicode spellings, sentence lines that only start with a heading word, word headings outranking numbered lines, bare Bengali-digit headings with a title line, Markdown front matter, tilde fences and links, blank input and EPUB refusal (PLAN M3.2).
 - Audiobooks: verified chunk cache (PLAN M3.2). Each rendered unit is stored under a key of engine, model revision, spoken text, language, reference audio, voice description and seed, committed atomically with a digest. Re-rendering or resuming a book reuses verified chunks and reports `cache_hits`; a corrupt or truncated chunk is dropped and rendered again, and any change to those inputs misses the cache.

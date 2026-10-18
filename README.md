@@ -116,7 +116,7 @@ Output files are not overwritten unless `--overwrite` is given. Ctrl-C requests 
 
 Run `bvs serve` for ordinary engines or `bvs serve --demo` for model-free checks. API paths start with `/api/v1`; `/docs` describes requests and `/health` is a minimal probe. Mutating browser requests use the CSRF cookie/header, Host/Origin checks and same-origin assets. Job submissions support `Idempotency-Key`; reuse the same key and body for transport retries. Requests without a key create new jobs.
 
-The CPU Docker recipe includes MMS/ASR runtime packages, ffmpeg, and no weights. Builds are not validated locally. The operator sets `BVS_API_TOKEN` to a strong private value before starting:
+The CPU Docker recipe includes MMS/ASR runtime packages, ffmpeg, and no weights. CI builds it on every pull request and tag and runs `scripts/container_smoke.sh` (non-root writable volumes, offline dummy output, the token guard, published port, auth, packaged UI and fonts, clean stop on SIGTERM); tagged releases publish `ghcr.io/muhib-karim/bangla-voice-studio:<tag>-cpu`. Locally, `make docker-smoke` builds and checks the image the same way. The operator sets `BVS_API_TOKEN` to a strong private value before starting:
 
 ```sh
 docker build -t bvs:cpu .

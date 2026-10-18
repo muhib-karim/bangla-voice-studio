@@ -28,31 +28,8 @@ jobs:
           persist-credentials: false
       - name: Build model-free CPU image
         run: docker build --target runtime -t bvs:check .
-      - name: Verify non-root volumes and offline dummy synthesis
-        run: |
-          docker run --rm --network none --entrypoint /bin/sh bvs:check -c 'test "$(id -u)" = 10001 && test -w /models && test -w /data'
-          docker run --rm --network none -e BVS_TEST_MODE=1 bvs:check say 'আমি বাংলায় বলি।' --engine dummy --output /data/demo.wav --srt
-          if docker run --rm bvs:check serve --host 0.0.0.0; then
-            echo 'Broad binding must refuse startup without a token'
-            exit 1
-          fi
-      - name: Verify published port, health, authentication and packaged UI
-        run: |
-          BVS_API_TOKEN=$(openssl rand -hex 32)
-          export BVS_API_TOKEN
-          echo "::add-mask::$BVS_API_TOKEN"
-          docker run --detach --name bvs-check -p 127.0.0.1:8000:8000 -e BVS_API_TOKEN -e BVS_TEST_MODE=1 bvs:check serve --demo --host 0.0.0.0
-          trap 'docker logs bvs-check; docker rm -f bvs-check' EXIT
-          for attempt in $(seq 1 60); do
-            if curl --fail --silent http://127.0.0.1:8000/health > /dev/null; then break; fi
-            sleep 0.5
-          done
-          curl --fail --silent http://127.0.0.1:8000/health
-          test "$(curl --silent -o /dev/null -w '%{http_code}' http://127.0.0.1:8000/speak)" = 401
-          curl --fail --silent --user "bvs:$BVS_API_TOKEN" http://127.0.0.1:8000/speak > shell.html
-          grep -q '/static/app.js' shell.html
-          curl --fail --silent -H "Authorization: Bearer $BVS_API_TOKEN" http://127.0.0.1:8000/api/v1/engines > /dev/null
-          curl --fail --silent --user "bvs:$BVS_API_TOKEN" http://127.0.0.1:8000/static/fonts/OFL.txt > /dev/null
+      - name: Container smoke (non-root volumes, offline dummy output, token guard, port, auth, UI, SIGTERM)
+        run: bash scripts/container_smoke.sh bvs:check
       - name: Publish versioned CPU image on tags
         if: startsWith(github.ref, 'refs/tags/v')
         env:

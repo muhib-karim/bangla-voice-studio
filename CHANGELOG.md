@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Distribution: wheel checks in the test suite (studio assets, fonts and licence packaged; tests left out; heavy model packages only behind extras; `bvs` console script), a reusable container smoke script used by CI that also checks a clean stop on SIGTERM and prints the image size, and `make wheel`, `make docker`, `make docker-smoke` and `make docker-cuda` targets (PLAN M3.4).
+
 ## 0.3.0 — 2026-10-18
 
 - Exports: per-chapter MP3 (128 kbps mono), chaptered AAC-in-M4B (64 kbps mono) with escaped UTF-8 ffmetadata titles and contiguous chapter marks, and speech MP3; encoded files are written atomically and a missing ffmpeg fails before rendering (PLAN M3.3).

@@ -170,3 +170,32 @@ def test_audiobook_api_exports_mp3_chapters_and_m4b(client: TestClient, tmp_path
         assert abs(end - next_start) <= 1  # contiguous: the pause stays with its chapter
     assert ends[-1] >= result["chapters"][-1]["end_ms"] - 1
     assert not any("deferred" in w for w in job["result"].get("warnings", []))
+
+
+def test_book_has_chapter_local_captions_and_manifest(client: TestClient) -> None:
+    response = client.post(
+        "/api/v1/audiobooks",
+        json={
+            "engine_id": "dummy",
+            "text": BOOK,
+            "title": "বই",
+            "formats": ["wav"],
+            "captions": ["srt", "vtt"],
+        },
+    )
+    assert response.status_code == 202, response.text
+    result = _finish(client, response.json()["id"])["result"]
+    for chapter in result["chapters"]:
+        srt = next(a for a in chapter["artifacts"] if a["media_type"] == "application/x-subrip")
+        body = client.get(srt["download_url"]).text
+        assert body.startswith("1\n00:00:00,000 --> ")  # restarts at the chapter's own zero
+        assert any(a["media_type"] == "text/vtt" for a in chapter["artifacts"])
+    manifest = next(a for a in result["artifacts"] if a["media_type"] == "application/json")
+    data = client.get(manifest["download_url"]).json()
+    assert data["title"] == "বই"
+    assert [c["title"] for c in data["chapters"]] == ["সূচনা", "শেষ"]
+    assert [(c["start_ms"], c["end_ms"]) for c in data["chapters"]] == [
+        (c["start_ms"], c["end_ms"]) for c in result["chapters"]
+    ]
+    names = {f["name"] for f in data["files"]}
+    assert {"audiobook.wav", "audiobook.srt", "audiobook.vtt"} <= names

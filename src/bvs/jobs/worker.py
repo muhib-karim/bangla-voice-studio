@@ -7,7 +7,7 @@ import os
 import shutil
 import subprocess
 import sys
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -186,6 +186,7 @@ def run(data: dict[str, Any], workspace: Path, context: RunContext) -> dict[str,
         engine.load(config, context)
         for chapter_index, (title, sentences) in enumerate(plans):
             chapter_start = clock
+            chapter_cues = len(all_cues)
             sentence_paths = []
             for sentence_index, fragments in enumerate(sentences):
                 fragment_paths = []
@@ -274,6 +275,13 @@ def run(data: dict[str, Any], workspace: Path, context: RunContext) -> dict[str,
                     chapter_files.append(
                         artifact(chapter_mp3, "audio/mpeg", duration=chapter_audio.frames / rate)
                     )
+                # Chapter-local captions restart at 00:00 with the chapter's own file.
+                offset_ms = chapter_start * 1000 // rate
+                local_cues = tuple(
+                    replace(cue, start_ms=cue.start_ms - offset_ms, end_ms=cue.end_ms - offset_ms)
+                    for cue in all_cues[chapter_cues:]
+                )
+                chapter_files += captions(local_cues, payload["captions"], chapter_path)
                 chapter_results.append(
                     dict(
                         index=chapter_index,
@@ -324,6 +332,28 @@ def run(data: dict[str, Any], workspace: Path, context: RunContext) -> dict[str,
     if is_book and book_cache is not None and book_cache.hits:
         warnings.add(f"Reused {book_cache.hits} verified cached chunks.")
     if is_book:
+        manifest = workspace / "manifest.json"
+        atomic_json(
+            manifest,
+            dict(
+                title=payload.get("title", ""),
+                author=payload.get("author", ""),
+                engine_id=payload["engine_id"],
+                duration_ms=round(duration * 1000),
+                chapters=[
+                    dict(
+                        index=c["index"],
+                        title=c["title"],
+                        start_ms=c["start_ms"],
+                        end_ms=c["end_ms"],
+                        files=[dict(name=a["name"], sha256=a["sha256"]) for a in c["artifacts"]],
+                    )
+                    for c in chapter_results
+                ],
+                files=[dict(name=a["name"], sha256=a["sha256"]) for a in files],
+            ),
+        )
+        files.append(artifact(manifest, "application/json"))
         return dict(
             type="audiobook",
             chapters=chapter_results,

@@ -164,7 +164,7 @@ def test_cancel_restore_and_resume_book(studio: Page) -> None:
     studio.get_by_role("button", name="Resume audiobook").click()
     studio.get_by_test_id("job-state").filter(has_text="succeeded").wait_for(timeout=60000)
     assert studio.url != original
-    assert "rerenders" in studio.get_by_test_id("results").inner_text()
+    assert "cached chunks" in studio.get_by_test_id("results").inner_text()
 
 
 def test_capture_labelled_demo(studio: Page) -> None:

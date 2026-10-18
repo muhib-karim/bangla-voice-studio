@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Distribution: wheel checks in the test suite (studio assets, fonts and licence packaged; tests left out; heavy model packages only behind extras; `bvs` console script), a reusable container smoke script used by CI that also checks a clean stop on SIGTERM and prints the image size, and `make wheel`, `make docker`, `make docker-smoke` and `make docker-cuda` targets (PLAN M3.4).
+- CUDA recipe: a manual Docker workflow run builds `Dockerfile.cuda` remotely and smoke-tests it on CPU (non-root volumes, CLI, offline dummy output, torch CUDA build) and records the image size; the CUDA image is not published until a GPU check passes.
 
 ## 0.3.0 — 2026-10-18
 

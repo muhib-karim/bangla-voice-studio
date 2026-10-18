@@ -1,6 +1,12 @@
 name: Docker
 
 on:
+  workflow_dispatch:
+    inputs:
+      cuda:
+        description: Build and CPU-smoke the CUDA recipe (not published)
+        type: boolean
+        default: true
   pull_request:
   push:
     tags: ['v*']
@@ -44,3 +50,29 @@ jobs:
           docker push "$BVS_IMAGE:cpu"
           docker image inspect "$BVS_IMAGE:$RELEASE_TAG-cpu" --format '{{json .RepoDigests}}' >> "$GITHUB_STEP_SUMMARY"
           docker logout ghcr.io
+  cuda:
+    # Manual only: the CUDA recipe is built remotely and smoke-tested on CPU.
+    # It is not published until a GPU compatibility check passes.
+    if: github.event_name == 'workflow_dispatch' && inputs.cuda
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Free runner disk for the CUDA base image
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          docker system prune --all --force
+          df -h /
+      - name: Build CUDA image (model-free)
+        run: docker build -f Dockerfile.cuda --target runtime -t bvs:cuda .
+      - name: CPU-only smoke of the CUDA image
+        run: |
+          docker run --rm --network none --entrypoint /bin/sh bvs:cuda -c 'test "$(id -u)" = 10001 && test -w /models && test -w /data'
+          docker run --rm --network none bvs:cuda --help > /dev/null
+          docker run --rm --network none -e BVS_TEST_MODE=1 bvs:cuda say 'আমি বাংলায় বলি।' --engine dummy --output /data/demo.wav
+          docker run --rm --network none --entrypoint python bvs:cuda -c "import torch; print('torch', torch.__version__, 'cuda build', torch.version.cuda)"
+          docker image inspect bvs:cuda --format 'CUDA image size: {{.Size}} bytes' | tee -a "$GITHUB_STEP_SUMMARY"

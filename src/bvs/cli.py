@@ -132,8 +132,10 @@ def speech(
 ) -> None:
     with errors():
         formats = [fmt for fmt, enabled in [("srt", srt), ("vtt", vtt)] if enabled]
-        if output.suffix.lower() != ".wav":
-            raise BVSError("INVALID_INPUT", "Use a .wav output; encoded exports are deferred to M3")
+        suffix = output.suffix.lower()
+        if suffix not in {".wav", ".mp3"}:
+            raise BVSError("INVALID_INPUT", "Use a .wav or .mp3 output")
+        audio_formats = ["wav", "mp3"] if suffix == ".mp3" else ["wav"]
         check_outputs([output, *(output.with_suffix("." + f) for f in formats)], overwrite)
         with Service(Settings(demo=engine == "dummy")) as svc:
             ref = reference_input(svc, reference, reference_text)
@@ -145,12 +147,15 @@ def speech(
                 reference=ref,
                 seed=seed,
                 captions=formats,
+                formats=audio_formats,
             )
             payload = CloneInput.model_validate(data) if clone else SpeechInput.model_validate(data)
             result = wait(svc, svc.submit_job("clone" if clone else "speech", payload))
             output.parent.mkdir(parents=True, exist_ok=True)
             for item in result["artifacts"]:
                 source = Path(svc.artifact(item["id"])["path"])
+                if suffix == ".mp3" and source.suffix == ".wav":
+                    continue
                 shutil.copyfile(source, output.with_suffix(source.suffix))
 
 

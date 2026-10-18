@@ -185,3 +185,17 @@ def test_capture_labelled_demo(studio: Page) -> None:
     studio.get_by_role("button", name="Preview chapters").click()
     studio.get_by_test_id("preview").get_by_text("শুরু", exact=False).wait_for()
     studio.screenshot(path=str(output / "demo-04.png"))
+
+
+def test_book_exports_mp3_chapters_and_m4b(studio: Page) -> None:
+    studio.get_by_role("link", name="Audiobook", exact=True).click()
+    studio.get_by_label("Title", exact=True).fill("রপ্তানি")
+    studio.get_by_label("Text", exact=True).fill("# প্রথম\n\nকথা।\n\n# দ্বিতীয়\n\nবিদায়।")
+    assert studio.get_by_label("MP3 per chapter").is_checked()
+    assert studio.get_by_label("Chaptered M4B audiobook").is_checked()
+    studio.get_by_role("button", name="Create audiobook").click()
+    studio.get_by_test_id("job-state").filter(has_text="succeeded").wait_for(timeout=60000)
+    results = studio.get_by_test_id("results")
+    assert results.get_by_role("link", name="audiobook.m4b").count() == 1
+    assert results.get_by_role("link", name="chapter-1.mp3").count() == 1
+    assert results.get_by_role("link", name="chapter-2.mp3").count() == 1

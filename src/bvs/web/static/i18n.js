@@ -34,7 +34,9 @@ const messages = {
   install: ['ইনস্টল কমান্ড', 'Install command'], status: ['অবস্থা', 'Status'], license: ['লাইসেন্স', 'License'],
   capability: ['সুবিধা', 'Capabilities'], size: ['মডেলের আকার', 'Model size'], unknown: ['অজানা', 'Unknown'],
   emptyTranscript: ['কথা শনাক্ত হয়নি।', 'No speech detected.'],
-  formats: ['এই সংস্করণে WAV অডিও, SRT ও VTT আছে। MP3/M4B পরে যোগ হবে।', 'This version exports WAV, SRT and VTT. MP3/M4B are deferred.'],
+  formats: ['WAV সবসময় তৈরি হয়। MP3 ও M4B-এর জন্য ffmpeg লাগে; সাবটাইটেল SRT ও VTT।', 'WAV is always made. MP3 and M4B need ffmpeg; captions are SRT and VTT.'],
+  audioFormats: ['অডিও ফরম্যাট', 'Audio formats'], mp3Chapters: ['প্রতিটি অধ্যায়ের MP3', 'MP3 per chapter'],
+  m4bBook: ['অধ্যায়সহ M4B অডিওবই', 'Chaptered M4B audiobook'],
   cacheHits: ['আগের যাচাই করা ক্যাশ অংশ পুনর্ব্যবহার', 'Reused cached chunks'],
   remove: ['অডিও সরান', 'Remove audio'], loading: ['লোড হচ্ছে…', 'Loading…'],
 };
